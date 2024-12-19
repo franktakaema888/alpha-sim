@@ -4,9 +4,9 @@ const { Schema } = mongoose;
 const portfolioSchema = new Schema(
   {
     userId: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User",
-        require: true
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "User",
+      require: true
     },
     portfolioName: {
       type: String,

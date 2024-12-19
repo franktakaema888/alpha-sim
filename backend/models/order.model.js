@@ -22,8 +22,7 @@ const orderSchema = new Schema(
     },
     purchaseDate: {
       type: Date,
-      default: Date.now,
-      required: true
+      default: Date.now
     }
   },
   {

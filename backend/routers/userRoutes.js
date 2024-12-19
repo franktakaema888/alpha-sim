@@ -4,5 +4,6 @@ const userController = require('../controllers/userController.js') // import use
 
 router.get('/', userController.getUser);
 router.post('/', userController.createUser);
+router.delete('/',userController.deleteUser)
 
 module.exports = router;

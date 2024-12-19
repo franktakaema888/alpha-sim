@@ -12,13 +12,20 @@ const holdingSchema = new Schema(
       type: String,
       required: [true, "Please indicate a stock symbol of your choice"]
     },
-    quantity: {
+    totalQuantity: {
       type: Number,
-      required: true
+      required: true,
+      default: 0
     },
     avgPrice: {
       type: Number,
-      required: true
+      required: true,
+      default: 0
+    },
+    totalAmount: {
+      type: Number,
+      required: true,
+      default: 0
     }
   }, 
   {
