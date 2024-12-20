@@ -20,3 +20,7 @@ const getCurrentPrice = async (req, res) => {
     });
   }
 };
+
+module.exports = {
+  getCurrentPrice
+};
