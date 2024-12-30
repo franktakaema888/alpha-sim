@@ -7,32 +7,36 @@ const Portfolio = require('../models/portfolio.model.js'); // Import portfolio m
 const User = require('../models/user.model.js'); // Import user model
 const Holding = require('../models/holding.model.js');
 
-const getPortfolio = async (req,res) => {
-  const { username } = req.body;
+const getPortfolio = async (req, res) => {
+  const { username } = req.params;
 
   try {
-    // find the username, ensure username is unique, check if there is such a user that has been created
-    const userInfo = await User.findOne({ username });
-
-    if(!userInfo) res.status(404).message("User is not found");
-
-    // get the username id from the user model
-    const userId = userInfo._id;
-    console.log(userId);
-    // Populate the user information
-    const populatedPortfolio = await Portfolio.find(userId).populate({
-        path: 'userId'
-    });
-
-    if (!populatedPortfolio.length) {
-      return res.status(404).json({ message: "No portfolios found for this user" });
+    // first find the user
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(populatedPortfolio);
+    // then find their portfolio
+    let portfolio = await Portfolio.findOne({ userId: user._id });
+    
+    // if no portfolio exists, create one automatically
+    if (!portfolio) {
+      portfolio = await Portfolio.create({
+        userId: user._id,
+        portfolioName: `${username}'s Portfolio`
+      });
+    }
+
+    return res.status(200).json(portfolio);
+
   } catch (error) {
-    res.status(500).send({message:error});
+    return res.status(500).json({
+      message: "Failed to fetch portfolio",
+      error: error.message
+    });
   }
-}
+};
 
 const createPortfolio = async (req,res) => {
   // request body will contain the name of portfolio and the username
@@ -100,8 +104,52 @@ const deletePortfolio = async (req, res) => {
   }
 };
 
+const getPortfolioByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    // find user and their available funds
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // find their portfolio
+    const portfolio = await Portfolio.findOne({ userId: user._id });
+    if (!portfolio) {
+      return res.status(404).json({ message: 'Portfolio not found' });
+    }
+
+    // return both portfolio info and user's available funds
+    res.status(200).json({
+      accountBalance: user.availableFunds,
+      portfolioId: portfolio._id,
+      portfolioName: portfolio.portfolioName
+    });
+
+  } catch (error) {
+    console.error('Error fetching portfolio:', error);
+    res.status(500).json({ message: 'Error fetching portfolio data' });
+  }
+};
+
+const getHoldingsByPortfolioId = async (req, res) => {
+  try {
+    const { portfolioId } = req.params;
+    
+    const holdings = await Holding.find({ portfolioId });
+    
+    res.status(200).json(holdings);
+  } catch (error) {
+    console.error('Error fetching holdings:', error);
+    res.status(500).json({ message: 'Error fetching holdings data' });
+  }
+};
+
 module.exports = {
   getPortfolio,
   createPortfolio,
-  deletePortfolio
+  deletePortfolio,
+  getPortfolioByUsername,
+  getHoldingsByPortfolioId
 };

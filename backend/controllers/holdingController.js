@@ -51,64 +51,60 @@ const createHoldingRecord = async (req, res) => {
   }
 };
 
-const updateHolding = async (
-  portfolioId,
-  stockSymbol,
-  orderType,
-  quantity,
-  stockPrice
-) => {
+const updateHolding = async (portfolioId, stockSymbol, orderType, quantity, stockPrice) => {
   try {
-    // find for a holding
+    // Validate inputs
+    if (!portfolioId || !stockSymbol || !orderType || !quantity || !stockPrice) {
+      throw new Error("Missing required fields for holding update");
+    }
+
+    // Find existing holding
     let holding = await Holding.findOne({ portfolioId, stockSymbol });
-    // check if the holding exist
-    if (!holding) {
-      // if no holding and it's a buy, create a new holding
-      if (orderType === "BUY") {
-        const newHolding = await Holding.create({
+
+    // Handle BUY order
+    if (orderType === "BUY") {
+      if (!holding) {
+        // Create new holding for first-time purchase
+        holding = await Holding.create({
           portfolioId,
           stockSymbol,
           totalQuantity: quantity,
           avgPrice: stockPrice,
-          totalAmount: quantity * stockPrice,
+          totalAmount: quantity * stockPrice
         });
-        return newHolding;
       } else {
-        throw new Error("Insufficient / No Stock to sell");
-      }
-    } else {
-      // we will update exisiting holding
-      if (orderType === "BUY") {
-        const totalCost =
-          holding.avgPrice * holding.totalQuantity + stockPrice * quantity;
+        // Update existing holding
+        const totalCost = holding.totalAmount + (stockPrice * quantity);
         holding.totalQuantity += quantity;
         holding.avgPrice = totalCost / holding.totalQuantity;
         holding.totalAmount = totalCost;
-      } else if (orderType === "SELL") {
-        if (holding.totalQuantity < quantity) {
-          throw new Error("There is insufficient stock to sell");
-        }
-        holding.totalAmount -= quantity * holding.avgPrice;
-        holding.totalQuantity -= quantity;
-
-        if (holding.totalQuantity === 0) {
-          await Holding.findByIdAndDelete(holding._id);
-          return null;
-        }
-
-        holding.avgPrice =
-          holding.totalQuantity > 0
-            ? holding.totalAmount / holding.totalQuantity
-            : 0;
+        await holding.save();
       }
+    } 
+    // Handle SELL order
+    else if (orderType === "SELL") {
+      if (!holding || holding.totalQuantity < quantity) {
+        throw new Error("Insufficient shares to sell");
+      }
+
+      holding.totalAmount -= quantity * holding.avgPrice;
+      holding.totalQuantity -= quantity;
+
+      if (holding.totalQuantity === 0) {
+        await Holding.findByIdAndDelete(holding._id);
+        return null;
+      }
+
+      holding.avgPrice = holding.totalAmount / holding.totalQuantity;
       await holding.save();
     }
 
     return holding;
   } catch (error) {
-    throw new Error("Failed to update holdings. ", error);
+    throw new Error(`Failed to update holdings: ${error.message}`);
   }
 };
+
 
 const deleteHolding = async (req, res) => {
   const { portfolioId, stockSymbol } = req.body;
