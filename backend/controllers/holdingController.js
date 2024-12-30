@@ -53,18 +53,18 @@ const createHoldingRecord = async (req, res) => {
 
 const updateHolding = async (portfolioId, stockSymbol, orderType, quantity, stockPrice) => {
   try {
-    // Validate inputs
+    // validate inputs
     if (!portfolioId || !stockSymbol || !orderType || !quantity || !stockPrice) {
       throw new Error("Missing required fields for holding update");
     }
 
-    // Find existing holding
+    // find existing holding
     let holding = await Holding.findOne({ portfolioId, stockSymbol });
 
-    // Handle BUY order
+    // handle BUY order
     if (orderType === "BUY") {
       if (!holding) {
-        // Create new holding for first-time purchase
+        // create new holding for first-time purchase
         holding = await Holding.create({
           portfolioId,
           stockSymbol,
@@ -73,7 +73,7 @@ const updateHolding = async (portfolioId, stockSymbol, orderType, quantity, stoc
           totalAmount: quantity * stockPrice
         });
       } else {
-        // Update existing holding
+        // update existing holding
         const totalCost = holding.totalAmount + (stockPrice * quantity);
         holding.totalQuantity += quantity;
         holding.avgPrice = totalCost / holding.totalQuantity;
@@ -81,7 +81,7 @@ const updateHolding = async (portfolioId, stockSymbol, orderType, quantity, stoc
         await holding.save();
       }
     } 
-    // Handle SELL order
+    // handle SELL order
     else if (orderType === "SELL") {
       if (!holding || holding.totalQuantity < quantity) {
         throw new Error("Insufficient shares to sell");
