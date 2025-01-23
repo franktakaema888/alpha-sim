@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+// import { AuthProvider } from './context/AuthContext.jsx';
+import AuthWrapper from './components/common/AuthWrapper';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Welcome from './pages/Welcome';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
+// import Login from './pages/Login';
+// import SignUp from './pages/SignUp';
 import Home from './pages/Home';
 import Trade from './pages/Trade';
 import Portfolio from './pages/Portfolio';
@@ -12,33 +13,33 @@ import './App.css'
 
 function App() {
   return (
-    <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          
-          {/* Protected Routes */}
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } />
-          <Route path="/trade" element={
-            <ProtectedRoute>
-              <Trade />
-            </ProtectedRoute>
-          } />
-          <Route path="/portfolio" element={
-            <ProtectedRoute>
-              <Portfolio />
-            </ProtectedRoute>
-          } />
-        </Routes>
+        <AuthWrapper>
+          <Routes>
+            <Route path="/" element={<Welcome />} />
+            <Route path="/about" element={<About />} />
+            {/* <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} /> */}
+            
+            {/* Protected Routes */}
+            <Route path="/home" element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } />
+            <Route path="/trade" element={
+              <ProtectedRoute>
+                <Trade />
+              </ProtectedRoute>
+            } />
+            <Route path="/portfolio" element={
+              <ProtectedRoute>
+                <Portfolio />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </AuthWrapper>
       </BrowserRouter>
-    </AuthProvider>
   );
 }
 

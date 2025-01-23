@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { createChart } from 'lightweight-charts';
-import axios from 'axios';
+// import axios from 'axios';
+
+import api from '../../services/api.service.js';
+
 
 const StockChart = ({ symbol }) => {
   const chartContainerRef = useRef();
@@ -94,7 +97,7 @@ const StockChart = ({ symbol }) => {
       
       try {
         console.log('Fetching data for symbol:', symbol, 'interval:', interval);
-        const response = await axios.get(`http://localhost:3000/price-history/${symbol}/${interval}`);
+        const response = await api.get(`http://localhost:3000/price-history/${symbol}/${interval}`);
 
         if (!response.data.success) {
           throw new Error('Chart data is not available');

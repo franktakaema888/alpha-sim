@@ -1,9 +1,11 @@
-import { useAuth } from '../context/useAuth';
+// import { useAuth } from '../context/useAuth';
+import { useAuth0 } from "@auth0/auth0-react";
+
 import Navbar from '../components/common/Navbar';
 import AuthNavbar from '../components/common/AuthNavbar';
 
 const About = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth0();
 
   return (
     <div className="min-h-screen bg-background">

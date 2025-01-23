@@ -1,14 +1,24 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/useAuth';
+import { Link } from 'react-router-dom';
+// import { useAuth } from '../../context/useAuth';
+import { useAuth0 } from "@auth0/auth0-react";
+import LogoutButton from './LogoutButton';
+
+
 
 const AuthNavbar = () => {
-  const { username, logout } = useAuth();
-  const navigate = useNavigate();
+  // const { username, logout } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth0();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  // const navigate = useNavigate();
+
+  // const handleLogout = () => {
+  //   logout();
+  //   navigate('/');
+  // };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <nav className="bg-primary p-4">
@@ -28,15 +38,12 @@ const AuthNavbar = () => {
         </div>
 
         {/* Right section with User Profile and Logout */}
-        <div className="flex items-center space-x-4">
-          <span className="text-white">Welcome, {username}!</span>
-          <button 
-            onClick={handleLogout}
-            className="px-4 py-2 text-white hover:bg-secondary rounded-lg transition"
-          >
-            Logout
-          </button>
-        </div>
+        {isAuthenticated && (
+          <div className="flex items-center space-x-4">
+            <span className="text-white">Welcome, {user.name}!</span>
+            <LogoutButton />
+          </div>
+        )}
       </div>
     </nav>
   );

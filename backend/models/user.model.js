@@ -3,6 +3,11 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema(
   {
+    auth0Id: {
+      type: String,
+      required: true,
+      unique: true
+    },
     username:{
       type: String, 
       require: [true, "Please enter a username"]

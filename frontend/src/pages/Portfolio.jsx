@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/useAuth';
+// import { useAuth } from '../context/useAuth';
+import { useAuth0 } from "@auth0/auth0-react";
+
 import AuthNavbar from '../components/common/AuthNavbar';
 import AccountSummary from '../components/portfolio/AccountSummary';
 import StockHoldings from '../components/portfolio/StockHoldings';
 import HoldingsTable from '../components/portfolio/HoldingsTable';
-import axios from 'axios';
+// import axios from 'axios';
+import api from '../services/api.service';
+
 
 const Portfolio = () => {
-  const { username } = useAuth();
+  const { username } = useAuth0();
   const [portfolioData, setPortfolioData] = useState({
     accountBalance: 0,
     valueInvested: 0,
@@ -21,11 +25,11 @@ const Portfolio = () => {
         setIsLoading(true);
         
         // Get portfolio data
-        const portfolioResponse = await axios.get(`http://localhost:3000/portfolio/${username}`);
+        const portfolioResponse = await api.get(`http://localhost:3000/portfolio/${username}`);
         const portfolioId = portfolioResponse.data.portfolioId;
         
         // Get holdings data using portfolioId
-        const holdingsResponse = await axios.get(`http://localhost:3000/portfolio/holdings/${portfolioId}`);
+        const holdingsResponse = await api.get(`http://localhost:3000/portfolio/holdings/${portfolioId}`);
 
         // Calculate total invested value
         const totalInvested = holdingsResponse.data.reduce((sum, holding) => 
@@ -59,7 +63,9 @@ const Portfolio = () => {
       
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-primary mb-6">
-          {username}&apos;s Portfolio
+          {/* {username}&apos;s Portfolio */}
+          {username} Portfolio
+
         </h1>        
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">

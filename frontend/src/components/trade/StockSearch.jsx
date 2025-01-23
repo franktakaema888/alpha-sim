@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
+// import axios from 'axios';
+
+import api from '../../services/api.service.js';
+
 
 const StockSearch = ({ onSelect }) => {
   const [query, setQuery] = useState('');
@@ -26,7 +29,7 @@ const StockSearch = ({ onSelect }) => {
     
     setIsLoading(true);
     try {
-      const response = await axios.get(`http://localhost:3000/company/search/${searchTerm}`);
+      const response = await api.get(`http://localhost:3000/company/search/${searchTerm}`);
       setResults(response.data.data);
       setShowDropdown(true);
     } catch (error) {
@@ -55,7 +58,7 @@ const StockSearch = ({ onSelect }) => {
   const handleCompanySelect = async (company) => {
     try {
       // Fetch current stock price
-      const priceResponse = await axios.get(`http://localhost:3000/stock/quote/${company.symbol}`);
+      const priceResponse = await api.get(`http://localhost:3000/stock/quote/${company.symbol}`);
       
       const { currentPrice, timestamp } = priceResponse.data.data;
       // Combine company info with stock data

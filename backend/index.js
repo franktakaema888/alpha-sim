@@ -1,6 +1,7 @@
 //EXPRESS
 const express = require('express')
 const cors = require('cors');
+const { auth } = require('express-oauth2-jwt-bearer');
 const app = express();
 const port = 3000;
 //MONGOOSE
@@ -20,6 +21,12 @@ async function main() {
   }
 }
 
+// Auth0 middleware
+const checkJwt = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}/`,
+});
+
 // IMPORT ROUTES
 const userRoutes = require('./routers/userRoutes.js');
 const portfolioRoutes = require('./routers/portfolioRoutes.js');
@@ -31,15 +38,21 @@ const stockPriceRoutes = require('./routers/stockPriceRoutes.js');
 
 /** SETUP EXPRESS ROUTES */
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
+// Public routes
 app.use('/user', userRoutes);
-app.use('/portfolio', portfolioRoutes);
-app.use('/holding', holdingRoutes);
-app.use('/order', orderRoutes);
-app.use('/company', companySearchRoutes);
-app.use('/price-history', priceHistoryRoutes);
-app.use('/stock', stockPriceRoutes);
+// Protected routes
+app.use('/portfolio', checkJwt, portfolioRoutes);
+app.use('/holding', checkJwt, holdingRoutes);
+app.use('/order', checkJwt, orderRoutes);
+app.use('/company', checkJwt, companySearchRoutes);
+app.use('/price-history', checkJwt, priceHistoryRoutes);
+app.use('/stock', checkJwt, stockPriceRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')

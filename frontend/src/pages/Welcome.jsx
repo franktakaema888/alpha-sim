@@ -1,7 +1,26 @@
-import { Link } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom'; 
+import { useEffect } from 'react';
 import Navbar from '../components/common/Navbar';
 
+import { useAuth0 } from "@auth0/auth0-react";
+import LoginButton from '../components/common/LoginButton';
+
 const Welcome = () => {
+
+  const { isAuthenticated, isLoading } = useAuth0();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home');
+    }
+  }, [isAuthenticated, navigate]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -27,19 +46,9 @@ const Welcome = () => {
             </p>
             
             <div className="flex justify-center space-x-4">
-              <Link 
-                to="/signup" 
-                className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-blue-600 transition"
-              >
-                Register
-              </Link>
-              <Link 
-                to="/login"
-                className="px-6 py-3 border border-accent text-accent rounded-lg hover:bg-accent hover:text-white transition"
-              >
-                Login
-              </Link>
+              <LoginButton />
             </div>
+
           </div>
         </div>
       </main>

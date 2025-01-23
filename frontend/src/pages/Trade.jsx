@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/useAuth';
+// import { useAuth } from '../context/useAuth';
+import { useAuth0 } from "@auth0/auth0-react";
 import AuthNavbar from '../components/common/AuthNavbar';
 import StockSearch from '../components/trade/StockSearch';
 import StockInfo from '../components/trade/StockInfo';
 import StockChart from '../components/trade/StockChart';
 import TradeModal from '../components/trade/TradeModal';
-import axios from 'axios';
+// import axios from 'axios';
+
+import api from '../services/api.service';
+
 
 const Trade = () => {
-  const { username } = useAuth();
+  const { username } = useAuth0();
+
   const [selectedStock, setSelectedStock] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [tradeResult, setTradeResult] = useState(null);
@@ -18,7 +23,7 @@ const Trade = () => {
       if (!username) return;
 
       try {
-        const response = await axios.get(`http://localhost:3000/portfolio/user/${username}`);
+        const response = await api.get(`http://localhost:3000/portfolio/user/${username}`);
         
         if (response.data && response.data._id) {
           localStorage.setItem('portfolioId', response.data._id);
@@ -37,7 +42,7 @@ const Trade = () => {
   const handleStockSelect = async (stock) => {
     try {
       // Get current price when stock is selected
-      const priceResponse = await axios.get(`http://localhost:3000/stock/quote/${stock.symbol}`);
+      const priceResponse = await api.get(`http://localhost:3000/stock/quote/${stock.symbol}`);
       setSelectedStock({
         ...stock,
         currentPrice: priceResponse.data.data.currentPrice
@@ -59,7 +64,7 @@ const Trade = () => {
     }
     
     try {
-      const response = await axios.post('http://localhost:3000/order', {
+      const response = await api.post('http://localhost:3000/order', {
         ...orderData,
         portfolioId,
       });

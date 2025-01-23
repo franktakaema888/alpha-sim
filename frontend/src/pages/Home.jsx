@@ -1,9 +1,15 @@
-import { useAuth } from '../context/useAuth';
+// import { useAuth } from '../context/useAuth';
+import { useAuth0 } from "@auth0/auth0-react";
+
 import { Link } from 'react-router-dom';
 import AuthNavbar from '../components/common/AuthNavbar';
 
 const Home = () => {
-  const { username } = useAuth();
+  const { username, isLoading} = useAuth0();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-background">

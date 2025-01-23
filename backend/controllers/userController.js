@@ -27,18 +27,39 @@ const getUser = async (req, res) => {
  * Additional Addons: 
  * - Check that the username is unique and not already in the database
  */
+// const createUser = async (req, res) => {
+//   const user = req.body;
+//   try {
+//     const newUser = await User.create(user);
+
+//     if(!user) res.status(404).send("Please enter a username or password");
+
+//     res.status(201).json(newUser);
+//   } catch (error) {
+//     res.status(500).send({message:error});
+//   }
+// }
+
 const createUser = async (req, res) => {
-  const user = req.body;
   try {
-    const newUser = await User.create(user);
-
-    if(!user) res.status(404).send("Please enter a username or password");
-
-    res.status(201).json(newUser);
+    const { sub: auth0Id, email } = req.auth.payload;
+    
+    let user = await User.findOne({ auth0Id });
+    
+    if (!user) {
+      user = await User.create({
+        auth0Id,
+        email,
+        username: email,
+        availableFunds: 10000
+      });
+    }
+    
+    res.status(200).json(user);
   } catch (error) {
-    res.status(500).send({message:error});
+    res.status(500).json({ message: error.message });
   }
-}
+};
 
 const deleteUser = async (req, res) => {
   const { username } = req.body;

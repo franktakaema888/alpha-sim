@@ -1,10 +1,19 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/useAuth';
+// import { useAuth } from '../../context/useAuth';
+import { useAuth0 } from "@auth0/auth0-react";
+
+import LoginButton from './LoginButton.jsx';
+import LogoutButton from './LogoutButton';
+
 
 const Navbar = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth0();
   const location = useLocation();
   const isLoginPage = location.pathname === '/login';
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <nav className="bg-primary p-4">
@@ -24,18 +33,12 @@ const Navbar = () => {
         {/* Right section with Sign In and Register */}
         {!isAuthenticated && !isLoginPage && (
           <div className="flex items-center space-x-4">
-            <Link 
-              to="/login"
-              className="px-6 py-2 text-white hover:bg-secondary rounded-lg transition"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/signup"
-              className="px-6 py-2 bg-accent text-white rounded-lg hover:bg-blue-600 transition"
-            >
-              Register
-            </Link>
+            <LoginButton />
+          </div>
+        )}
+        {isAuthenticated && (
+          <div className="flex items-center space-x-4">
+            <LogoutButton />
           </div>
         )}
       </div>
